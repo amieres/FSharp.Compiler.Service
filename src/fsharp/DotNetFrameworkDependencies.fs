@@ -13,6 +13,8 @@ module internal FSharp.Compiler.DotNetFrameworkDependencies
 
     type private TypeInThisAssembly = class end
 
+    let inline ifEmptyUse alternative filename = if String.IsNullOrEmpty filename then alternative else filename
+
     let fSharpCompilerLocation =
         let location = Path.GetDirectoryName(typeof<TypeInThisAssembly>.Assembly.Location)
         match FSharpEnvironment.BinFolderOfDefaultFSharpCompiler (Some location) with
@@ -28,7 +30,7 @@ module internal FSharp.Compiler.DotNetFrameworkDependencies
     let getFsiLibraryName = "FSharp.Compiler.Interactive.Settings"
     let getDefaultFSharpCoreLocation = Path.Combine(fSharpCompilerLocation, getFSharpCoreLibraryName + ".dll")
     let getDefaultFsiLibraryLocation = Path.Combine(fSharpCompilerLocation, getFsiLibraryName + ".dll")
-    let implementationAssemblyDir = Path.GetDirectoryName(typeof<obj>.Assembly.Location)
+    let implementationAssemblyDir = Path.GetDirectoryName(typeof<obj>.Assembly.Location) |> ifEmptyUse fSharpCompilerLocation
     let isRunningOnCoreClr = (typeof<obj>.Assembly).FullName.StartsWith("System.Private.CoreLib", StringComparison.InvariantCultureIgnoreCase)
 
     // Use the ValueTuple that is executing with the compiler if it is from System.ValueTuple
